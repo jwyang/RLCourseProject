@@ -27,7 +27,7 @@ Nice to see you here. All you need should be set up. Keep going to train your ow
 
 In this project, we are using the Policy Gradient (PG) algorithm for the learning of policy. It is simple and straightforward. You can get a good sense from the [Karpathy's blog](http://karpathy.github.io/2016/05/31/rl/). Once you understand what the Policy Gradient is, you can move to the next step, training the agent.
 
-Also, if you want to learn more about RL, there are difinitely a lot resources, such as David Silver's [course](http://www0.cs.ucl.ac.uk/staff/d.silver/web/Teaching.html), Denny Britz's [blogs](http://www.wildml.com/2016/10/learning-reinforcement-learning/).
+Also, if you want to learn more about RL, there are difinitely a lot resources, such as [David Silver's course](http://www0.cs.ucl.ac.uk/staff/d.silver/web/Teaching.html), [Denny Britz's blogs](http://www.wildml.com/2016/10/learning-reinforcement-learning/).
 
 ### Training
 
