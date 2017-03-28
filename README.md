@@ -39,6 +39,6 @@ $ bazel run :toy_agent --define headless=false -- --length=1000 --episode=20 --h
 
 If it successfully runs, you will see the following window:
 
-![Screenshot](images/screenshot.png)
+->![Screenshot](images/screenshot.png)<-
 
 
