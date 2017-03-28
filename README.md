@@ -8,7 +8,7 @@ In this project, we are simulating a situation where an animal, like squirrel, t
 
 1. [Deepmind Lab](https://github.com/deepmind/lab). Install deepmind lab according to the instructions in the original git repository.
 
-2. [PyTorch](). Since we need to analyze the visual signals perceived by the agents, we use convolutional neural network (CNN) in PyTorch. Please also refer to the orignal repository for the installation.
+2. [PyTorch](http://pytorch.org/). Since we need to analyze the visual signals perceived by the agents, we use convolutional neural network (CNN) in PyTorch. Please also refer to the orignal repository for the installation.
 
 3. Git clone our repository to deepmind *lab* directory. Then, add to *lab/BUILD* the following lines"
 
