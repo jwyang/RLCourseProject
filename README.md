@@ -31,7 +31,7 @@ Also, if you want to learn more about RL, there are difinitely a lot resources, 
 
 ### Training
 
-Once you have installed the above two main dependencies, you should be able to run the code to train the agents. Go to *lab* direction, and simply run:
+Once you have installed the above two main dependencies, you should be able to run the code to train the agents. Go to *lab* directory, and simply run:
 
 ```bash
 $ bazel run :toy_agent --define headless=false -- --length=1000 --episode=20 --height=256 --width=256
