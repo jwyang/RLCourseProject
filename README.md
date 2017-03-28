@@ -10,7 +10,7 @@ In this project, we are simulating a situation where an animal, like squirrel, t
 
 2. [PyTorch](). Since we need to analyze the visual signals perceived by the agents, we use convolutional neural network (CNN) in PyTorch. Please also refer to the orignal repository for the installation.
 
-3. Git clone our repository to deepmind /*lab*/ directory. Then, add to /*lab/BUILD*/ the following lines"
+3. Git clone our repository to deepmind *lab* directory. Then, add to *lab/BUILD* the following lines"
 
 ```bash
 py_binary(
@@ -31,7 +31,7 @@ Also, if you want to learn more about RL, there are difinitely a lot resources, 
 
 ### Training
 
-Once you have installed the above two main dependencies, you should be able to run the code to train the agents. Go to /*lab*/ direction, and simply run:
+Once you have installed the above two main dependencies, you should be able to run the code to train the agents. Go to *lab* direction, and simply run:
 
 ```bash
 $ bazel run :toy_agent --define headless=false -- --length=1000 --episode=20 --height=256 --width=256
