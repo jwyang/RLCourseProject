@@ -10,6 +10,19 @@ In this project, we are simulating a situation where an animal, like squirrel, t
 
 2. [PyTorch](). Since we need to analyze the visual signals perceived by the agents, we use convolutional neural network (CNN) in PyTorch. Please also refer to the orignal repository for the installation.
 
+3. Git clone our repository to deepmind /*lab*/ directory. Then, add to /*lab/BUILD*/ the following lines"
+
+```bash
+py_binary(
+    name = "toy_agent",
+    srcs = ["RLCourseProject/toy_agent.py"],
+    data = [":deepmind_lab.so"],
+    main = "RLCourseProject/toy_agent.py",
+)
+```
+
+Nice to see you here. All you need should be set up. Keep going to train your own agent.
+
 ### Model
 
 In this project, we are using the Policy Gradient (PG) algorithm for the learning of policy. It is simple and straightforward. You can get a good sense from the [Karpathy's blog](http://karpathy.github.io/2016/05/31/rl/). Once you understand what the Policy Gradient is, you can move to the next step, training the agent.
@@ -18,10 +31,10 @@ Also, if you want to learn more about RL, there are difinitely a lot resources, 
 
 ### Training
 
-Once you have installed the above two main dependencies, you should be able to run the code to train the agents, simply using:
+Once you have installed the above two main dependencies, you should be able to run the code to train the agents. Go to /*lab*/ direction, and simply run:
 
 ```bash
-$ bazel run :random_agent --define headless=false -- --length=1000 --episode=20 --height=256 --width=256
+$ bazel run :toy_agent --define headless=false -- --length=1000 --episode=20 --height=256 --width=256
 ```
 
 
