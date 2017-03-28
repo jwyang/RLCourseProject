@@ -10,6 +10,10 @@ In this project, we are simulating a situation where an animal, like squirrel, t
 
 2. [PyTorch](). Since we need to analyze the visual signals perceived by the agents, we use convolutional neural network (CNN) in PyTorch. Please also refer to the orignal repository for the installation.
 
+### About the model
+
+In this project, we are using the Policy Gradient (PG) algorithm for the learning of policy. It is simple and straightforward. You can get a good sense from the [Karpathy's blog](http://karpathy.github.io/2016/05/31/rl/). Once you understand what the Policy Gradient is, you can move to the next step, training the agent.
+
 ### Train the agent
 
 Once you have installed the above two main dependencies, you should be able to run the code to train the agents, simply using:
