@@ -16,11 +16,7 @@ function api:createPickup(className)
 end
 
 function api:nextMap()
-  map = "**************\n*a * x *******\n**     *   ***\n ****  I   ***\n    *  *   ***\n    *  *******\n    *   ******\n******H*******\n*        I P *\n**************"
-  api._count = api._count + 1
-  for i = 0, api._count do
-    map = map.." A"
-  end
+  map = "*****************\n*P I  *       *A*\n****  *       * *\n*             *H*\n*               *\n*  *     ****   *\n*  *            *\n****    *H*     *\n*       * *   * *\n*       *A*   * *\n*H**  *** * * * *\n* A*      *** * *\n****          * *\n*             * *\n****       **H* *\n*A I       *A *X*\n*****************"
   return make_map.makeMap("new_map", map)
 end
 
