@@ -34,7 +34,7 @@ Keyword arguments:
 *   `color` (boolean, default false) - Change color of bots each episode.
 ]]
 function factory.createLevelApi(kwargs)
-  kwargs.botCount = kwargs.botCount or 4
+  kwargs.botCount = kwargs.botCount or 1
   kwargs.skill = kwargs.skill or 4.0
   kwargs.episodeLengthSeconds = kwargs.episodeLengthSeconds or 600
   kwargs.color = kwargs.color or false
@@ -53,7 +53,7 @@ function factory.createLevelApi(kwargs)
 
   --brought from our map
   function api:nextMap()
-    maps = {"***************\n*P I  *     * *\n**** A*  * A*H*\n*             *\n****   *H*    *\n*    A * *  * *\n*H**  ** **A* *\n*  *   A  *H* *\n*  I      I *X*\n***************", "***************\n*P I  *     * *\n****  * A*  *H*\n*AA           *\n****   *H*    *\n*      * *A * *\n*H**  ** ** * *\n*  *      *H* *\n*  I      IA*X*\n***************", "***************\n*P I  *     * *\n****  * A*  *H*\n*             *\n****   *H*   A*\n*A    A* *  * *\n*H**  ** ** * *\n*  *      *H* *\n*A I      I *X*\n***************", "***************\n*P I  *  A  *A*\n****  *  *  *H*\n* A           *\n****   *H*    *\n*      * *  * *\n*H**  **A** * *\n*  *      *H* *\n*A I      I *X*\n***************", "***************\n*P I  *     *A*\n****  *  *  *H*\n*             *\n****   *H*    *\n*      *A*  * *\n*H**  ** ** * *\n* A*      *H* *\n*A I      IA*X*\n***************"}
+    maps = {"***************\n*P I  *     * *\n**** A*  * A*H*\n*             *\n****   *H*    *\n*    A * *  * *\n*H**  ** **A* *\n*  *   A  *H* *\n*  I      I *P*\n***************", "***************\n*P I  *     * *\n****  * A*  *H*\n*AA           *\n****   *H*    *\n*      * *A * *\n*H**  ** ** * *\n*  *      *H* *\n*  I      IA*P*\n***************", "***************\n*P I  *     * *\n****  * A*  *H*\n*             *\n****   *H*   A*\n*A    A* *  * *\n*H**  ** ** * *\n*  *      *H* *\n*A I      I *P*\n***************", "***************\n*P I  *  A  *A*\n****  *  *  *H*\n* A           *\n****   *H*    *\n*      * *  * *\n*H**  **A** * *\n*  *      *H* *\n*A I      I *P*\n***************", "***************\n*P I  *     *A*\n****  *  *  *H*\n*             *\n****   *H*    *\n*      *A*  * *\n*H**  ** ** * *\n* A*      *H* *\n*A I      IA*P*\n***************"}
     api._count = api._count + 1  
     map = maps[api._count]
     if api._count == 5 then

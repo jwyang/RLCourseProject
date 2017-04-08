@@ -313,7 +313,7 @@ if __name__ == '__main__':
                       help='Number of frames per second')
   parser.add_argument('--runfiles_path', type=str, default=None,
                       help='Set the runfiles path to find DeepMind Lab data')
-  parser.add_argument('--level_script', type=str, default='tests/new_map',
+  parser.add_argument('--level_script', type=str, default='squirrel_map',
                       help='The environment level script to load')
 
   args = parser.parse_args()
