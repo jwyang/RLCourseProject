@@ -21,6 +21,10 @@ py_binary(
 )
 ```
 
+4. Move the included "squirrel_map.lua" file into DeepMind Lab's *lab/assets/game_scripts/*
+
+5. Move the included "custom_factory.lua" file into DeepMind Lab's *lab/assets/game_scripts/factories/*
+
 Nice to see you here. All you need should be set up. Keep going to train your own agent.
 
 ### Model
