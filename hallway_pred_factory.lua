@@ -40,6 +40,9 @@ function factory.createLevelApi(kwargs)
   kwargs.color = kwargs.color or false
   assert(kwargs.botCount <= (kwargs.color and #BOT_NAMES_COLOR or #BOT_NAMES))
   local api = {}
+  api._count = 0
+  api.finish_count = 2
+
 
   function api:start(episode, seed, params)
     random.seed(seed)
@@ -48,17 +51,17 @@ function factory.createLevelApi(kwargs)
       api.bot_hue_degrees_ = random.uniformInt(0, 359)
     end
     --brought from our map
-    api._count = 0
   end
 
   --brought from our map
   function api:nextMap()
     map = "A P I A P"
-    api._count = api._count + 1
     for i = 0, api._count do
       map = map.." A"
     end
-    return make_map.makeMap("demo_map_pred_" .. api._count, map)
+    api._finish_count = api._count + api._count
+    api._count = 0
+    return make_map.makeMap("demo_map_pred_" .. api._finish_count, map)
   end
 
   --brought from our map
@@ -68,6 +71,14 @@ function factory.createLevelApi(kwargs)
   --brought from our map
   function api:createPickup(className)
     return pickups.defaults[className]
+  end
+
+  function api:pickup(spawn_id)
+    api._count = api._count + 1
+    if api._count == api._finish_count then
+      game:finishMap()
+      api._count = 0
+    end
   end
 
   function api:addBots()
