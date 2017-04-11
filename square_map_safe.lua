@@ -1,4 +1,4 @@
-local factory = require 'factories.sqaure_map_factory'
+local factory = require 'factories.hallway_pred_factory'
 
 return factory.createLevelApi{
 	botCount = 1,

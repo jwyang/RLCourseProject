@@ -36,7 +36,7 @@ Keyword arguments:
 function factory.createLevelApi(kwargs)
   kwargs.botCount = kwargs.botCount or 1
   kwargs.skill = kwargs.skill or 4.0
-  kwargs.episodeLengthSeconds = kwargs.episodeLengthSeconds or 600
+  kwargs.episodeLengthSeconds = kwargs.episodeLengthSeconds or 120
   kwargs.color = kwargs.color or false
   assert(kwargs.botCount <= (kwargs.color and #BOT_NAMES_COLOR or #BOT_NAMES))
   local api = {}
