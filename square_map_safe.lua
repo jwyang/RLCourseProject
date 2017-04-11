@@ -1,6 +1,5 @@
-local factory = require 'factories.hallway_pred_factory'
+local factory = require 'factories.square_pred_factory'
 
 return factory.createLevelApi{
-	botCount = 1,
-    skill = 4
+	botCount = 0
 }
