@@ -30,17 +30,16 @@ Keyword arguments:
 *   `mapName` (string) - Name of map to load.
 *   `botCount` (number, [-1, 6], default 4) - Number of bots. (-1 for all).
 *   `skill` (number, [1.0, 5.0], default 4.0) - Skill level of bot.
-*   `episodeLengthSeconds` (number, default 600) - Episode length in seconds.
+*   `episodeLengthSeconds` (number, default 30) - Episode length in seconds.
 *   `color` (boolean, default false) - Change color of bots each episode.
 ]]
 function factory.createLevelApi(kwargs)
   kwargs.botCount = kwargs.botCount or 1
   kwargs.skill = kwargs.skill or 4.0
-  kwargs.episodeLengthSeconds = kwargs.episodeLengthSeconds or 600
+  kwargs.episodeLengthSeconds = kwargs.episodeLengthSeconds or 30
   kwargs.color = kwargs.color or false
   assert(kwargs.botCount <= (kwargs.color and #BOT_NAMES_COLOR or #BOT_NAMES))
   local api = {}
-  api._count = 0
   api.finish_count = 2
 
 
@@ -50,6 +49,7 @@ function factory.createLevelApi(kwargs)
       -- Pick a random angle.
       api.bot_hue_degrees_ = random.uniformInt(0, 359)
     end
+    api._count = 0
     --brought from our map
   end
 
@@ -75,7 +75,7 @@ function factory.createLevelApi(kwargs)
 
   function api:pickup(spawn_id)
     api._count = api._count + 1
-    if api._count == api._finish_count then
+    if api._count >= api._finish_count then
       game:finishMap()
       api._count = 0
     end
