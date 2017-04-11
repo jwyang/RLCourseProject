@@ -38,7 +38,6 @@ function factory.createLevelApi(kwargs)
   kwargs.skill = kwargs.skill or 4.0
   kwargs.episodeLengthSeconds = kwargs.episodeLengthSeconds or 60
   kwargs.color = kwargs.color or false
-  assert(kwargs.botCount <= (kwargs.color and *BOT_NAMES_COLOR or *BOT_NAMES))
   local api = {}
 
   function api:start(episode, seed, params)
@@ -72,7 +71,7 @@ function factory.createLevelApi(kwargs)
       if i == kwargs.botCount + 1 then
         break
       end
-      bots[*bots + 1] = {name = name, skill = kwargs.skill}
+      bots[#bots + 1] = {name = name, skill = kwargs.skill}
     end
     return bots
   end
