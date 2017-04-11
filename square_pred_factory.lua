@@ -53,15 +53,7 @@ function factory.createLevelApi(kwargs)
 
   --brought from our map
   function api:nextMap()
-    map = "**********\n
-    *P A   A *\n
-    * ******A*\n
-    *A****** *\n
-    * A    A *\n
-    * ******A*\n
-    *A****** *\n
-    * A   A P*\n
-    **********"
+    map = "**********\n*P A   A *\n* ******A*\n*A****** *\n* A    A *\n* ******A*\n*A****** *\n* A   A P*\n**********"
     return make_map.makeMap("pred_map_square", map)
   end
 
