@@ -21,9 +21,10 @@ py_binary(
 )
 ```
 
-4. Move the included "squirrel_map.lua" file into DeepMind Lab's *lab/assets/game_scripts/*
+4. Move the included "squirrel_map.lua", "demo_map_pred.lua", "square_map_safe.lua", and "square_map_pred.lua" files into DeepMind Lab's *lab/assets/game_scripts/*
 
-5. Move the included "custom_factory.lua" file into DeepMind Lab's *lab/assets/game_scripts/factories/*
+5. Move the included "custom_factory.lua", "square_pred_factory.lua", and "hallway_pred_factory.lua" file into DeepMind Lab's *lab/assets/game_scripts/factories/*
+
 
 Nice to see you here. All you need should be set up. Keep going to train your own agent.
 
@@ -39,6 +40,14 @@ Once you have installed the above two main dependencies, you should be able to r
 
 ```bash
 $ bazel run :toy_agent --define headless=false -- --length=1000 --episode=20 --height=256 --width=256
+```
+
+By default, toy_agent launches on our experimental maps. Note that you can change the level being run by passing the --level_script parameter like so:
+```bash
+$ bazel run :toy_agent --define headless=false -- --length=1000 --episode=20 --height=256 --width=256 --level_script tests/demo_map
+$ bazel run :toy_agent --define headless=false -- --length=1000 --episode=20 --height=256 --width=256 --level_script demo_map_pred
+$ bazel run :toy_agent --define headless=false -- --length=1000 --episode=20 --height=256 --width=256 --level_script square_map_safe
+$ bazel run :toy_agent --define headless=false -- --length=1000 --episode=20 --height=256 --width=256 --level_script square_map_pred
 ```
 
 If it successfully runs, you will see the following window:
