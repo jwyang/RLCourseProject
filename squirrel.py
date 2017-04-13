@@ -22,6 +22,7 @@ from __future__ import print_function
 import argparse
 import random
 import numpy as np
+from scipy.misc import imsave
 from scipy.misc import imresize
 
 import deepmind_lab
@@ -39,28 +40,75 @@ from torch.autograd import Variable
 def _action(*entries):
   return np.array(entries, dtype=np.intc)
 
-class Net(nn.Module):
-    def __init__(self, width, height, actions):
-        super(Net, self).__init__()
-        self.conv1 = nn.Conv2d(3, 16, kernel_size=5)
-        self.conv2 = nn.Conv2d(16, 32, kernel_size=5)
-        self.conv3 = nn.Conv2d(32, 64, kernel_size=5)        
-        self.fc1 = nn.Linear(64 * 2 * 2, 64)
-        self.fc2 = nn.Linear(64, actions)
-        self.gamma = 0.99
-        self.reward_seq = []
-        self.action_prob_seq = []
-        self.action_seq = []
+class PolicyNet(nn.Module):
+  def __init__(self, width, height, actions):
+    super(PolicyNet, self).__init__()
+    self.conv1 = nn.Conv2d(3, 16, kernel_size=5)
+    self.conv1.weight.data.normal_(0, 0.01)
+    self.conv1.bias.data.fill_(0)
 
-    def forward(self, x):
-        x = F.relu(F.max_pool2d(self.conv1(x), 2))
-        x = F.relu(F.max_pool2d(self.conv2(x), 4))
-        x = F.relu(F.max_pool2d(self.conv3(x), 4))
-        x = x.view(-1, 64 * 2 * 2)
-        x = F.relu(self.fc1(x))        
-        # x = F.dropout(x, training=self.training)
-        x = self.fc2(x)
-        return F.softmax(x)
+    self.conv2 = nn.Conv2d(16, 32, kernel_size=5)
+    self.conv2.weight.data.normal_(0, 0.01)
+    self.conv2.bias.data.fill_(0)
+
+    self.conv3 = nn.Conv2d(32, 64, kernel_size=5)        
+    self.conv3.weight.data.normal_(0, 0.01)
+    self.conv3.bias.data.fill_(0)
+
+    self.fc1 = nn.Linear(64 * 2 * 2, actions)
+    self.fc1.weight.data.normal_(0, 0.01)
+    self.fc1.bias.data.fill_(0)
+
+    # self.fc2 = nn.Linear(64, actions)
+    self.gamma = 0.99
+    self.reward_seq = []
+    self.action_prob_seq = []
+    self.action_seq = []
+
+  def forward(self, x):
+    x = F.relu(F.max_pool2d(self.conv1(x), 2))
+    x = F.relu(F.max_pool2d(self.conv2(x), 4))
+    x = F.relu(F.max_pool2d(self.conv3(x), 4))
+    x = x.view(-1, 64 * 2 * 2)
+    # x = F.relu(self.fc1(x))        
+    # x = F.dropout(x, training=self.training)
+    x = self.fc1(x)
+    return F.softmax(x)
+
+# # define memory class for storing short-term memory
+# class Mmeory():
+#   def __init__(self, mem_size, mem_dim):
+
+#define perception class for recognizing apples and predators
+class RecognizeNet(nn.Module):
+  def __init__(self):
+    super(RecognizeNet, self).__init__()
+    self.conv1 = nn.Conv2d(3, 16, kernel_size=5)
+    self.conv1.weight.data.normal_(0, 0.01)
+    self.conv1.bias.data.fill_(0)
+
+    self.conv2 = nn.Conv2d(16, 32, kernel_size=5)
+    self.conv2.weight.data.normal_(0, 0.01)
+    self.conv2.bias.data.fill_(0)
+
+    self.conv3 = nn.Conv2d(32, 64, kernel_size=5)        
+    self.conv3.weight.data.normal_(0, 0.01)
+    self.conv3.bias.data.fill_(0)
+
+    self.fc1 = nn.Linear(64 * 2 * 2, 2)
+    self.fc1.weight.data.normal_(0, 0.01)
+    self.fc1.bias.data.fill_(0)    
+
+    self.pred_seq = []
+    self.reward_seq = []
+
+  def forward(self, x):
+    x = F.relu(F.max_pool2d(self.conv1(x), 2))
+    x = F.relu(F.max_pool2d(self.conv2(x), 4))
+    x = F.relu(F.max_pool2d(self.conv3(x), 4))
+    x = x.view(-1, 64 * 2 * 2)
+    x = self.fc1(x)
+    return F.softmax(x)
 
 class SpringAgent(object):
   """A random agent using spring-like forces for its action evolution."""
@@ -69,6 +117,7 @@ class SpringAgent(object):
 
     ACTIONS = {
       'forward': _action(0, 0, 0, 1, 0, 0, 0),
+      'backward': _action(0, 0, 0, -1, 0, 0, 0),      
       'look_left': _action(-20, 0, 0, 0, 0, 0, 0),
       'look_right': _action(20, 0, 0, 0, 0, 0, 0),
       'strafe_left': _action(0, 0, -1, 0, 0, 0, 0),
@@ -77,41 +126,60 @@ class SpringAgent(object):
     self.ACTION_LIST = ACTIONS.values()
     self.rewards = 0
     self.depth_seq = []
+    self.frames = torch.Tensor()
+    self.root = '/home/jwyang/Researches/lab/RLCourseProject/images/'
     # define the policy network, taking observation as input, 
     # and action probability as output
     # torch.cuda.set_device(0)
-    self.policynet = Net(width, height, len(self.ACTION_LIST))
+    self.policynet = PolicyNet(width, height, len(self.ACTION_LIST))
+    self.foodrecognet = RecognizeNet()
+    self.predrecognet = RecognizeNet()
     # self.policynet = torch.load('policy_epoch_10.pth')
     # self.policynet.cuda()
     self.optimizer = optim.Adam(self.policynet.parameters(), lr=1e-2)
+    self.optimizer_fd = optim.Adam(self.foodrecognet.parameters(), lr=1e-2)
+    self.optimizer_pd = optim.Adam(self.predrecognet.parameters(), lr=1e-2)
 
-  def select_action(self, frame):
-    frame_d = imresize(frame, 0.5)    
-    frame_t = np.transpose(frame_d, (2, 0, 1))
-    state = torch.from_numpy(frame_t).float().unsqueeze(0)
+
+  def select_action(self, state):
     probs = self.policynet(Variable(state))    
     action = probs.multinomial()
     self.policynet.action_prob_seq.append(probs)
     self.policynet.action_seq.append(action)
     return action.data
 
-  def step_policy(self, reward, frame):
+  def recog_food(self, state):
+    pred = self.foodrecognet(Variable(state))
+    self.foodrecognet.pred_seq.append(pred)
+    isfood = pred.data[0, 1]     
+    return isfood
+
+  def step_policy(self, reward, frame, t):
     """Gets an image state and a reward, returns an action."""
     # compute reward based on the depth map
     # we do not want the agent get too close 
     # to the walls or other obstacles
-    frame = 2 * (frame / 255 - 0.5)
-    frame_depth = frame[:,:,3] # convert from [0, 255] to [0, 1]
+    imsave(self.root + 'output_' + str(t) + '.jpg', frame[:,:,0:3])
+    frame = frame / 255 - 0.5
+    frame_depth = frame[:,:,3]
+    self.depth_seq.append(frame_depth.mean())
     # if len(self.depth_seq) > 0:
     #  reward = reward + (frame_depth.mean() - self.depth_seq[-1]) * 0.3
     #if frame_depth.mean() > 0.9:
     #  reward = reward + 1
-    self.depth_seq.append(frame_depth.mean())
+    frame_d = imresize(frame[:,:,0:3], 0.5)    
+    frame_t = np.transpose(frame_d, (2, 0, 1))
+    state = torch.from_numpy(frame_t).float().unsqueeze(0)
+    self.frames = torch.cat([self.frames, state], 0)
+
+    # judge whether the squirrel see the food
+    isfood = self.recog_food(state)
+    self.foodrecognet.reward_seq.append(max(0, isfood - 0.6))    
+
     self.rewards += reward
-    if reward == 0:
-      reward = -0.1
     self.policynet.reward_seq.append(reward)
-    action = self.select_action(frame[:,:,0:3])
+
+    action = self.select_action(state)
     return self.ACTION_LIST[action[0, 0]]
 
   def clip_action(self, action):
@@ -121,25 +189,52 @@ class SpringAgent(object):
     """update policy based on the results in one episode"""
     R = 0
     rewards = []
+    labels_food = torch.LongTensor(len(self.policynet.reward_seq)).fill_(0)    
+    t = len(self.policynet.reward_seq) - 1
     for r in self.policynet.reward_seq[::-1]:
-      R = r + self.policynet.gamma * R
+      r_food = self.foodrecognet.reward_seq[t]
+      R = (r + r_food) + self.policynet.gamma * R
       rewards.insert(0, R)
+      if r == 1:
+        for tp in range(t - 5, t):
+          labels_food[tp] = 1      
+      t = t - 1
+
     rewards = torch.Tensor(rewards)
-    # rewards = (rewards - rewards.mean()) / (rewards.std() + np.finfo(np.float32).eps)
+    rewards = (rewards - rewards.mean()) / (rewards.std() + np.finfo(np.float32).eps)
     for action, r in zip(self.policynet.action_seq, rewards):
       action.reinforce(r)
     self.optimizer.zero_grad()
     autograd.backward(self.policynet.action_seq, [None for _ in self.policynet.action_seq])
     self.optimizer.step()
+
+    # train food recognizer
+    frames_var = Variable(self.frames)
+    y_pred = self.foodrecognet(frames_var)
+    criterion = nn.CrossEntropyLoss()
+    labels_food_var = Variable(labels_food)
+    loss = criterion(y_pred, labels_food_var)
+    self.optimizer_fd.zero_grad()
+    loss.backward()
+    self.optimizer_fd.zero_grad()
+
     del self.policynet.reward_seq[:]
     del self.policynet.action_prob_seq[:]
     del self.policynet.action_seq[:]
     del self.depth_seq[:]
+    self.frames = torch.Tensor()
+
+    del self.foodrecognet.pred_seq[:]
+    del self.foodrecognet.reward_seq[:]
 
   def checkpoint(self, i_episode):
     save_path = "policy_epoch_{}.pth".format(i_episode)
     torch.save(self.policynet, save_path)
     print("Polocy saved to {}".format(save_path))
+
+    save_path = "foodnet_epoch_{}.pth".format(i_episode)
+    torch.save(self.foodrecognet, save_path)
+    print("Foodnet saved to {}".format(save_path))
 
 def run(episode, length, width, height, fps, level):
   """Spins up an environment and runs the random agent."""
@@ -162,14 +257,14 @@ def run(episode, length, width, height, fps, level):
   for i_episode in xrange(episode):
     print("episode: ", i_episode)
     env.reset()
-    for _ in xrange(length):
+    for t in xrange(length):
       if not env.is_running():
         print('Environment stopped early')      
         # env.reset()
         # agent.reset()
         break
       obs = env.observations()
-      action = agent.step_policy(reward, obs['RGBD_INTERLACED'])      
+      action = agent.step_policy(reward, obs['RGBD_INTERLACED'], t)      
       reward = env.step(action, num_steps=1)
 
     print('Finished after %i steps. Total reward received is %f'
