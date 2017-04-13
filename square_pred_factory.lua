@@ -36,7 +36,7 @@ Keyword arguments:
 function factory.createLevelApi(kwargs)
   kwargs.botCount = kwargs.botCount or 1
   kwargs.skill = kwargs.skill or 4.0
-  kwargs.episodeLengthSeconds = kwargs.episodeLengthSeconds or 60
+  kwargs.episodeLengthSeconds = kwargs.episodeLengthSeconds or 600
   kwargs.color = kwargs.color or false
   local api = {}
 
@@ -52,7 +52,7 @@ function factory.createLevelApi(kwargs)
 
   --brought from our map
   function api:nextMap()
-    map = "**********\n*P A   A *\n* ******A*\n*A****** *\n* A    A *\n* ******A*\n*A****** *\n* A   A P*\n**********"
+    map = "**********\n*P A   A *\n* ******A*\n*A****** *\n* A  G A *\n* ******A*\n*A****** *\n* A   A P*\n**********"
     return make_map.makeMap("pred_map_square", map)
   end
 
