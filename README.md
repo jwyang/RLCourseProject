@@ -44,10 +44,10 @@ $ bazel run :toy_agent --define headless=false -- --length=1000 --episode=20 --h
 
 By default, toy_agent launches on our experimental maps. Note that you can change the level being run by passing the --level_script parameter like so:
 ```bash
-$ bazel run :toy_agent --define headless=false -- --length=1000 --episode=20 --height=256 --width=256 --level_script tests/demo_map
-$ bazel run :toy_agent --define headless=false -- --length=1000 --episode=20 --height=256 --width=256 --level_script demo_map_pred
-$ bazel run :toy_agent --define headless=false -- --length=1000 --episode=20 --height=256 --width=256 --level_script square_map_safe
-$ bazel run :toy_agent --define headless=false -- --length=1000 --episode=20 --height=256 --width=256 --level_script square_map_pred
+$ bazel run :squirrel --define headless=false -- --length=1000 --episode=20 --height=256 --width=256 --level_script tests/demo_map
+$ bazel run :squirrel --define headless=false -- --length=1000 --episode=20 --height=256 --width=256 --level_script demo_map_pred
+$ bazel run :squirrel --define headless=false -- --length=1000 --episode=20 --height=256 --width=256 --level_script square_map_safe
+$ bazel run :squirrel --define headless=false -- --length=1000 --episode=20 --height=256 --width=256 --level_script square_map_pred
 ```
 
 If it successfully runs, you will see the following window:
