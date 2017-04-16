@@ -197,7 +197,10 @@ class SpringAgent(object):
       rewards.insert(0, R)
       if r == 1:
         for tp in range(t - 5, t):
-          labels_food[tp] = 1      
+          labels_food[tp] = 1
+      elif r == -1:
+        for tp in range(t - 5, t):
+          labels_food[tp] = 2      
       t = t - 1
     print(rewards)
     rewards = torch.Tensor(rewards)
