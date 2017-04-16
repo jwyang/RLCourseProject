@@ -43,7 +43,7 @@ def _action(*entries):
 class PolicyNet(nn.Module):
   def __init__(self, width, height, actions):
     super(PolicyNet, self).__init__()
-    self.conv1 = nn.Conv2d(3, 16, kernel_size=5)
+    self.conv1 = nn.Conv2d(4, 16, kernel_size=5)
     self.conv1.weight.data.normal_(0, 0.01)
     self.conv1.bias.data.fill_(0)
 
@@ -83,7 +83,7 @@ class PolicyNet(nn.Module):
 class RecognizeNet(nn.Module):
   def __init__(self):
     super(RecognizeNet, self).__init__()
-    self.conv1 = nn.Conv2d(3, 16, kernel_size=5)
+    self.conv1 = nn.Conv2d(4, 16, kernel_size=5)
     self.conv1.weight.data.normal_(0, 0.01)
     self.conv1.bias.data.fill_(0)
 
@@ -116,18 +116,18 @@ class SpringAgent(object):
   def __init__(self, action_spec, width, height):
 
     ACTIONS = {
-      'forward': _action(0, 0, 0, 1, 0, 0, 0),
-      'backward': _action(0, 0, 0, -1, 0, 0, 0),      
-      'look_left': _action(-20, 0, 0, 0, 0, 0, 0),
       'look_right': _action(20, 0, 0, 0, 0, 0, 0),
       'strafe_left': _action(0, 0, -1, 0, 0, 0, 0),
-      'strafe_right': _action(0, 0, 1, 0, 0, 0, 0)
+      'strafe_right': _action(0, 0, 1, 0, 0, 0, 0),
+      'forward': _action(0, 0, 0, 1, 0, 0, 0),
+      'backward': _action(0, 0, 0, -1, 0, 0, 0),      
+      'look_left': _action(-20, 0, 0, 0, 0, 0, 0)
     }
     self.ACTION_LIST = ACTIONS.values()
     self.rewards = 0
     self.depth_seq = []
     self.frames = torch.Tensor()
-    self.root = '/home/jwyang/Researches/lab/RLCourseProject/images/'
+    self.root = '/home/jwyang/Researches/lab/RLCourseProject/'
     # define the policy network, taking observation as input, 
     # and action probability as output
     # torch.cuda.set_device(0)
@@ -136,13 +136,14 @@ class SpringAgent(object):
     self.predrecognet = RecognizeNet()
     # self.policynet = torch.load('policy_epoch_10.pth')
     # self.policynet.cuda()
-    self.optimizer = optim.Adam(self.policynet.parameters(), lr=1e-2)
+    self.optimizer = optim.Adam(self.policynet.parameters(), lr=5e-4)
     self.optimizer_fd = optim.Adam(self.foodrecognet.parameters(), lr=1e-2)
     self.optimizer_pd = optim.Adam(self.predrecognet.parameters(), lr=1e-2)
 
 
   def select_action(self, state):
     probs = self.policynet(Variable(state))    
+    print(probs)
     action = probs.multinomial()
     self.policynet.action_prob_seq.append(probs)
     self.policynet.action_seq.append(action)
@@ -159,22 +160,21 @@ class SpringAgent(object):
     # compute reward based on the depth map
     # we do not want the agent get too close 
     # to the walls or other obstacles
-    imsave(self.root + 'output_' + str(t) + '.jpg', frame[:,:,0:3])
-    frame = frame / 255 - 0.5
+    # imsave(self.root + 'images/output_' + str(t) + '.jpg', frame[:,:,0:3])
     frame_depth = frame[:,:,3]
     self.depth_seq.append(frame_depth.mean())
-    # if len(self.depth_seq) > 0:
-    #  reward = reward + (frame_depth.mean() - self.depth_seq[-1]) * 0.3
-    #if frame_depth.mean() > 0.9:
-    #  reward = reward + 1
-    frame_d = imresize(frame[:,:,0:3], 0.5)    
+    if frame_depth.mean() / 255 < 0.1:
+      reward = reward + (frame_depth.mean() / 255 - 1)
+
+    frame = 2 * (frame / 255 - 0.5)
+    frame_d = imresize(frame, 0.5)    
     frame_t = np.transpose(frame_d, (2, 0, 1))
     state = torch.from_numpy(frame_t).float().unsqueeze(0)
     self.frames = torch.cat([self.frames, state], 0)
 
     # judge whether the squirrel see the food
-    isfood = self.recog_food(state)
-    self.foodrecognet.reward_seq.append(max(0, isfood - 0.6))    
+    # isfood = self.recog_food(state)
+    # self.foodrecognet.reward_seq.append(max(0, isfood - 0.6))    
 
     self.rewards += reward
     self.policynet.reward_seq.append(reward)
@@ -192,14 +192,14 @@ class SpringAgent(object):
     labels_food = torch.LongTensor(len(self.policynet.reward_seq)).fill_(0)    
     t = len(self.policynet.reward_seq) - 1
     for r in self.policynet.reward_seq[::-1]:
-      r_food = self.foodrecognet.reward_seq[t]
-      R = (r + r_food) + self.policynet.gamma * R
+      # r_food = self.foodrecognet.reward_seq[t]
+      R = r + self.policynet.gamma * R
       rewards.insert(0, R)
       if r == 1:
         for tp in range(t - 5, t):
           labels_food[tp] = 1      
       t = t - 1
-
+    print(rewards)
     rewards = torch.Tensor(rewards)
     rewards = (rewards - rewards.mean()) / (rewards.std() + np.finfo(np.float32).eps)
     for action, r in zip(self.policynet.action_seq, rewards):
@@ -209,14 +209,14 @@ class SpringAgent(object):
     self.optimizer.step()
 
     # train food recognizer
-    frames_var = Variable(self.frames)
-    y_pred = self.foodrecognet(frames_var)
-    criterion = nn.CrossEntropyLoss()
-    labels_food_var = Variable(labels_food)
-    loss = criterion(y_pred, labels_food_var)
-    self.optimizer_fd.zero_grad()
-    loss.backward()
-    self.optimizer_fd.zero_grad()
+    #frames_var = Variable(self.frames)
+    #y_pred = self.foodrecognet(frames_var)
+    #criterion = nn.CrossEntropyLoss()
+    #labels_food_var = Variable(labels_food)
+    #loss = criterion(y_pred, labels_food_var)
+    #self.optimizer_fd.zero_grad()
+    #loss.backward()
+    #self.optimizer_fd.zero_grad()
 
     del self.policynet.reward_seq[:]
     del self.policynet.action_prob_seq[:]
@@ -228,11 +228,11 @@ class SpringAgent(object):
     del self.foodrecognet.reward_seq[:]
 
   def checkpoint(self, i_episode):
-    save_path = "policy_epoch_{}.pth".format(i_episode)
+    save_path = self.root + "models/policy_epoch_{}.pth".format(i_episode)
     torch.save(self.policynet, save_path)
     print("Polocy saved to {}".format(save_path))
 
-    save_path = "foodnet_epoch_{}.pth".format(i_episode)
+    save_path = self.root + "models/foodnet_epoch_{}.pth".format(i_episode)
     torch.save(self.foodrecognet, save_path)
     print("Foodnet saved to {}".format(save_path))
 
