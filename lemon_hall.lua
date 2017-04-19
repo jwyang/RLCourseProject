@@ -16,7 +16,7 @@ function api:createPickup(className)
 end
 
 function api:nextMap()
-  map = "*********\n*       *\n*ALLALAL*\n*      P*\n*ALALALA*\n*       *\n*********"
+  map = "*********\n*       *\n A L A L \n*      P*\n L A L A \n*       *\n*********"
   return make_map.makeMap("hallway_map", map)
 end
 
