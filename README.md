@@ -14,18 +14,16 @@ In this project, we are simulating a situation where an animal, like squirrel, t
 
 ```bash
 py_binary(
-    name = "toy_agent",
-    srcs = ["RLCourseProject/toy_agent.py"],
+    name = "squirrel",
+    srcs = ["RLCourseProject/squirrel.py"],
     data = [":deepmind_lab.so"],
-    main = "RLCourseProject/toy_agent.py",
+    main = "RLCourseProject/squirrel.py",
 )
 ```
 
-4. Move the included "squirrel_map.lua", "square_map_safe.lua", and "lemon_hall.lua" files into DeepMind Lab's *lab/assets/game_scripts/*
+4. Move the included lemon_hall.lua" file into DeepMind Lab's *lab/assets/game_scripts/*
 
-5. Move the included "custom_factory.lua" file into DeepMind Lab's *lab/assets/game_scripts/factories/*
-
-6. Edit *lab/assets/game_scripts/common/make_map.lua* lines 6-9 so that it is now:
+5. Edit *lab/assets/game_scripts/common/make_map.lua* lines 6-9 so that it is now:
 ```bash
 local pickups = {
     A = 'apple_reward',
@@ -48,15 +46,13 @@ Also, if you want to learn more about RL, there are difinitely a lot resources, 
 Once you have installed the above two main dependencies, you should be able to run the code to train the agents. Go to *lab* directory, and simply run:
 
 ```bash
-$ bazel run :toy_agent --define headless=false -- --length=1000 --episode=20 --height=256 --width=256
+$ bazel run :squirrel --define headless=false -- --length=1000 --episode=20 --height=256 --width=256
 ```
 
-By default, toy_agent launches on our experimental maps. Note that you can change the level being run by passing the --level_script parameter like so:
+By default, toy_agent launches on the demo map. Note that you can change the level being run by passing the --level_script parameter like so:
 ```bash
 $ bazel run :squirrel --define headless=false -- --length=1000 --episode=20 --height=256 --width=256 --level_script tests/demo_map
 $ bazel run :squirrel --define headless=false -- --length=1000 --episode=20 --height=256 --width=256 --level_script lemon_hall
-$ bazel run :squirrel --define headless=false -- --length=1000 --episode=20 --height=256 --width=256 --level_script square_map_safe
-$ bazel run :squirrel --define headless=false -- --length=1000 --episode=20 --height=256 --width=256 --level_script squirrel_map
 ```
 
 If it successfully runs, you will see the following window:
