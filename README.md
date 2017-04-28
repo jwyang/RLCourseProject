@@ -32,7 +32,12 @@ local pickups = {
 }
 ```
 
+6. Create a directory named 'models' inside this repository, that is where your policy will be saved after each episode/epoch.
 
+7. Edit lines 100 and 259 in *squirrel.py*, so that the paths reflect your own machine. For example, if you have cloned the repo in your *Documents* directory, they should be:
+```bash
+self.root = '/home/<your_account>/Documents/lab/RLCourseProject/'
+```
 Nice to see you here. All you need should be set up. Keep going to train your own agent.
 
 ### Model
